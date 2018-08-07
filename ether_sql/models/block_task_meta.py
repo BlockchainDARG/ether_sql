@@ -36,3 +36,13 @@ class BlockTaskMeta(base):
         with current_session.db_session_scope():
             return current_session.db_session.query(cls).\
                     filter_by(task_id=task_id).first()
+
+    @classmethod
+    def add_block_task_pending(cls, task_id, block_number):
+        current_session = get_current_session()
+        block_task_meta = cls(task_id=task_id,
+                              task_name='add_block_number',
+                              state='PENDING',
+                              block_number=block_number)
+        with current_session.db_session_scope():
+            current_session.db_session.add(block_task_meta)

@@ -46,18 +46,12 @@ def scrape_blocks(list_block_numbers, mode):
     :param str mode: Mode to be used weather parallel or single
     """
     task_list = []
-    current_session = get_current_session()
     for block_number in list_block_numbers:
         logger.debug('Adding block: {}'.format(block_number))
         if mode == 'parallel':
             r = add_block_number.delay(block_number)
             task_list.append(r)
-            block_task_meta = BlockTaskMeta(task_id=r.id,
-                                            task_name='add_block_number',
-                                            state='PENDING',
-                                            block_number=block_number)
-            with current_session.db_session_scope():
-                current_session.db_session.add(block_task_meta)
+            BlockTaskMeta.add_block_task_pending(r.id, block_number)
         elif mode == 'single':
             add_block_number(block_number)
         else:

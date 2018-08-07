@@ -71,6 +71,7 @@ class ParityTestSettings(TestSettings):
     # Use this option to parse traces, needs parity with cli --tracing=on
     PARSE_TRACE = True
     PARSE_STATE_DIFF = True
+    NEW_BLOCKS = True
     TIMEOUT = 60
 
 
