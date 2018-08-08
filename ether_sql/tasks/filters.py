@@ -22,6 +22,9 @@ def new_blocks():
     for block_hash in block_hashes:
         block_data = current_session.w3.eth.getBlock(block_hash)
         block_number = to_int(block_data['number'])
+
+        BlockTaskMeta.get_tasks_from_block_number(block_number)
+
         r = add_block_number.delay(block_number)
         BlockTaskMeta.add_block_task_pending(r.id, block_number)
     logger.info(block_hashes)

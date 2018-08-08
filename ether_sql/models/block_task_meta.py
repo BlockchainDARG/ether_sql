@@ -46,3 +46,10 @@ class BlockTaskMeta(base):
                               block_number=block_number)
         with current_session.db_session_scope():
             current_session.db_session.add(block_task_meta)
+
+    @classmethod
+    def get_tasks_from_block_number(cls, block_number):
+        current_session = get_current_session()
+        with current_session.db_session_scope():
+            return current_session.db_session.query(cls).\
+                    filter_by(block_number=block_number)

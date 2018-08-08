@@ -20,7 +20,7 @@ app = Celery('ether_sql',
 celery_schedule = {
     'new_blocks': {
         'task': 'ether_sql.tasks.filters.new_blocks',
-        'schedule': timedelta(seconds=30),
+        'schedule': timedelta(seconds=1),
         'options': {'queue' : 'celery_filters'}
     },
     }
