@@ -33,6 +33,8 @@ class DefaultSettings():
     # Use this option to parse traces, needs parity with cli --tracing=on
     PARSE_TRACE = False
     PARSE_STATE_DIFF = False
+    NEW_BLOCKS = False
+    BLOCK_LAG = 100
 
 
 class PersonalInfuraSettings(DefaultSettings):
@@ -71,6 +73,7 @@ class ParityTestSettings(TestSettings):
     PARSE_TRACE = True
     PARSE_STATE_DIFF = True
     TIMEOUT = 60
+    NEW_BLOCKS = True
 
 
 SETTINGS_MAP = {'DefaultSettings': DefaultSettings,

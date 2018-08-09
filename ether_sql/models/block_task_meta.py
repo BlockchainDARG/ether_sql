@@ -14,11 +14,11 @@ class BlockTaskMeta(base):
     """
     __tablename__ = 'block_task_meta'
     id = Column(Integer, primary_key=True)
-    task_id = Column(Text, nullable=False)
+    task_id = Column(Text, nullable=True)
     task_name = Column(Text, nullable=False)
     state = Column(Text, nullable=False)
     block_number = Column(Numeric, nullable=False)
-    block_hash = Column(String(66), nullable=True)
+    block_hash = Column(String(66), nullable=False)
 
     def to_dict(self):
         return {
@@ -43,6 +43,16 @@ class BlockTaskMeta(base):
         block_task_meta = cls(task_id=task_id,
                               task_name='add_block_number',
                               state='PENDING',
+                              block_number=block_number)
+        with current_session.db_session_scope():
+            current_session.db_session.add(block_task_meta)
+
+    @classmethod
+    def add_block_as_waiting(cls, task_id, block_number):
+        current_session = get_current_session()
+        block_task_meta = cls(task_id=task_id,
+                              task_name='push_blocks_in_queue',
+                              state='WAITING',
                               block_number=block_number)
         with current_session.db_session_scope():
             current_session.db_session.add(block_task_meta)
