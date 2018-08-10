@@ -1,11 +1,10 @@
 import logging
 from celery.utils.log import get_task_logger
-from web3.utils.encoding import to_int
+from web3.utils.encoding import to_int, to_hex
 from ether_sql.globals import get_current_session
 from ether_sql.tasks.worker import app
 from ether_sql.tasks.scrapper import add_block_number
 from ether_sql.models.block_task_meta import BlockTaskMeta
-
 
 logger = get_task_logger(__name__)
 
@@ -22,7 +21,10 @@ def new_blocks():
     for block_hash in block_hashes:
         block_data = current_session.w3.eth.getBlock(block_hash)
         block_number = to_int(block_data['number'])
-
+        BlockTaskMeta.add_block_task_meta(task_name='new_blocks',
+                              state='WAITING',
+                              block_number=block_number,
+                              block_hash=to_hex(block_hash))
     logger.info(block_hashes)
 
 
@@ -33,3 +35,14 @@ def push_blocks_in_queue():
     settings.BLOCK_LAG number of blocks behind the current ethereum client and
     pushes the blocks in waiting to the queue.
     """
+    current_session = get_current_session()
+
+    blocks_in_waiting = BlockTaskMeta.get_blocks_to_be_pushed_in_queue()
+    for blocks in blocks_in_waiting:
+        block_number = int(blocks.block_number)
+        add_block_task = add_block_number.delay(block_number)
+        BlockTaskMeta.update_block_task_meta_from_block_number(
+                block_number=block_number,
+                task_id=add_block_task.id,
+                state='PENDING',
+                task_name='add_block_number')

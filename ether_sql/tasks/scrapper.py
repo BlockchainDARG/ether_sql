@@ -24,7 +24,7 @@ class BlockTaskTracker(Task):
     def on_success(self, retval, task_id, args, kwargs):
         current_session = get_current_session()
         with current_session.db_session_scope():
-            block_task_meta = BlockTaskMeta.get_task_from_id(task_id)
+            block_task_meta = BlockTaskMeta.get_block_task_meta_from_task_id(task_id)
             block_task_meta.state = 'SUCCESS'
             block_task_meta.block_hash = retval
             current_session.db_session.add(block_task_meta)
@@ -32,7 +32,7 @@ class BlockTaskTracker(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         current_session = get_current_session()
         with current_session.db_session_scope():
-            block_task_meta = BlockTaskMeta.get_task_from_id(task_id)
+            block_task_meta = BlockTaskMeta.get_block_task_meta_from_task_id(task_id)
             block_task_meta.state = 'FAILURE'
             current_session.db_session.add(block_task_meta)
 
@@ -68,14 +68,12 @@ def add_block_number(self, block_number):
     :param int block_number: The block number to add to the database
     """
     current_session = get_current_session()
-    block_task_meta = BlockTaskMeta.get_task_from_id(self.request.id)
-    if block_task_meta is not None:
-        block_task_meta.state = 'STARTED'
-        with current_session.db_session_scope():
-            logger.debug('Task started')
-            current_session.db_session.add(block_task_meta)
+    block_task_meta = BlockTaskMeta.update_block_task_meta_from_block_number(
+        block_number=block_number,
+        state='STARTED')
 
     # getting the block_data from the node
+    logger.debug('block_number: {}'.format(block_number))
     block_data = current_session.w3.eth.getBlock(
                             block_identifier=block_number,
                             full_transactions=True)

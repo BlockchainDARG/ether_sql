@@ -34,7 +34,7 @@ class DefaultSettings():
     PARSE_TRACE = False
     PARSE_STATE_DIFF = False
     NEW_BLOCKS = False
-    BLOCK_LAG = 100
+    BLOCK_LAG = 2
 
 
 class PersonalInfuraSettings(DefaultSettings):
